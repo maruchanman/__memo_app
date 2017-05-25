@@ -107,22 +107,25 @@ const styles = {
     justifyContent: 'center'
   },
   row: {
-    width: Constants.width / 2 - 2,
-    height: Constants.width / 2 - 2,
+    width: Constants.width / 2 - 20,
+    height: Constants.width / 2 - 20,
     borderRadius: 100,
-    margin: 1,
-    backgroundColor: 'whitesmoke',
+    margin: 10,
+    borderColor: 'whitesmoke',
+    borderWidth: 5,
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20
   },
   title: {
-    color: Constants.fontColor,
+    color: "white",
     textAlign: 'center',
+    fontSize: 18,
     fontWeight: 'bold'
   },
   create: {
+    borderWidth: 0,
     backgroundColor: Constants.imageColor
   },
   createText: {
