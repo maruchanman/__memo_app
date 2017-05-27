@@ -16,20 +16,6 @@ const storage = new Storage({
   defaultExpires: null
 })
 
-const ModalWindow = props => (
-  <View style={styles.modal}>
-    <TextInput
-      placeholder="30文字まで"
-      placeholderTextColor="white"
-      autoFocus={props.autoFocus}
-      selectionColor={Constants.imageColor}
-      onChangeText={(text) => props.change(props.target, text)}
-      onEndEditing={props.end}
-      maxLength={30}
-      style={styles.textInput}/>
-  </View>
-)
-
 export default class Mandalart extends React.Component {
 
   constructor(props) {
@@ -48,7 +34,7 @@ export default class Mandalart extends React.Component {
   }
 
   openModal(target) {
-    this.setState({target: target, isOpen: true})
+    this.setState({target: target, isOpen: true}, () => this.refs["textInput"].focus())
   }
 
   endEdit() {
@@ -90,13 +76,20 @@ export default class Mandalart extends React.Component {
             ))}
           </View>
         </ScrollView>
-        {this.state.isOpen ? (
-          <ModalWindow
-            target={this.state.target}
+        <View style={this.state.isOpen ? styles.modal : styles.hidden}>
+          <TextInput
+            ref="textInput"
+            value={this.state.data[this.state.target]}
+            placeholder="30文字まで"
+            placeholderTextColor="white"
+            blurOnSubmit={true}
             autoFocus={this.props.isOpen}
-            end={this.endEdit.bind(this)}
-            change={this.changeText.bind(this)}/>
-        ) : null}
+            selectionColor={Constants.imageColor}
+            onChangeText={(text) => this.changeText(this.state.target, text)}
+            onEndEditing={this.endEdit.bind(this)}
+            maxLength={30}
+            style={styles.textInput}/>
+        </View>
       </View>
     )
   }
@@ -149,7 +142,7 @@ const styles = {
     backgroundColor: 'rgba(0, 0, 0, 0.5)'
   },
   hidden: {
-    display: 'none'
+    height: 0
   },
   textInput: {
     flex: 1,
