@@ -167,7 +167,7 @@ const styles = {
     flexDirection: 'row'
   },
   center: {
-    backgroundColor: Constants.imageColor,
+    backgroundColor: "white",
     width: Constants.width / 3 - 2,
     height: Constants.width / 3 - 2,
     margin: 2,
@@ -183,7 +183,6 @@ const styles = {
     padding: 5,
   },
   centerText: {
-    color: 'white',
     fontWeight: 'bold',
     textAlign: 'center'
   },

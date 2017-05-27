@@ -6,6 +6,7 @@ import {
   AsyncStorage,
   TouchableWithoutFeedback
 } from 'react-native'
+import Icon from 'react-native-vector-icons/FontAwesome'
 import Storage from 'react-native-storage'
 import Mandalart from './Memo.js'
 import Constants from '../Constants.js'
@@ -24,7 +25,7 @@ const dataTemplate = {
 const CreateButton = props => (
   <TouchableWithoutFeedback onPress={() => props.create(props.navigator)}>
     <View style={[styles.row, styles.create]}>
-      <Text style={[styles.title, styles.createText]}>CREATE</Text>
+      <Icon name="plus" size={30} style={styles.createButton} />
     </View>
   </TouchableWithoutFeedback>
 )
@@ -113,18 +114,16 @@ export default class MandaList extends React.Component {
 const styles = {
   wrapper: {
     paddingVertical: 10,
-    flexDirection: 'row',
+    flexDirection: 'column',
     flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'center'
   },
   row: {
-    width: Constants.width / 2 - 20,
-    height: Constants.width / 2 - 20,
-    borderRadius: 100,
-    margin: 10,
+    width: Constants.width - 10,
+    marginVertical: 5,
     borderColor: 'whitesmoke',
-    borderWidth: 5,
+    borderWidth: 2,
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
@@ -137,11 +136,10 @@ const styles = {
     fontWeight: 'bold'
   },
   create: {
-    borderWidth: 0,
-    backgroundColor: Constants.imageColor
+    width: Constants.width,
+    borderWidth: 0
   },
-  createText: {
-    color: 'white',
-    fontSize: 24
+  createButton: {
+    color: "whitesmoke"
   }
 }

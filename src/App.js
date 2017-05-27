@@ -12,8 +12,9 @@ export default class App extends React.Component {
       <NavigatorIOS
         style={{flex: 1}}
         itemWrapperStyle={{backgroundColor: Constants.imageColor}}
-        tintColor={Constants.imageColor}
-        barTintColor='white'
+        tintColor="white"
+        titleTextColor="white"
+        barTintColor={Constants.imageColor}
         shadowHidden={true}
         initialRoute={{
           component: MandaList,
