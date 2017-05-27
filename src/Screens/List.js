@@ -16,6 +16,11 @@ const storage = new Storage({
   defaultExpires: null
 })
 
+const dataTemplate = {
+  center: "", upper: "", left: "", bottom: "", right: "",
+  upperRight: "", upperLeft: "", bottomRight: "", bottomLeft: ""
+}
+
 const CreateButton = props => (
   <TouchableWithoutFeedback onPress={() => props.create(props.navigator)}>
     <View style={[styles.row, styles.create]}>
@@ -23,12 +28,15 @@ const CreateButton = props => (
     </View>
   </TouchableWithoutFeedback>
 )
+
 const Row = props => (
   <TouchableWithoutFeedback onPress={() => props.navigator.push({
     component: Mandalart, title: props.data.center,
     rightButtonSystemIcon: "trash",
     onRightButtonPress: () => props.removeStorage(props.id, props.navigator),
-    passProps: {id: props.id, data: props.data, update: props.updateStorage, isOpen: false}})}>
+    passProps: {
+      id: props.id, data: props.data, depth: 0,
+      update: props.updateStorage, isOpen: false, base: "center"}})}>
     <View style={styles.row}>
       <Text style={styles.title}>{props.data.center}</Text>
     </View>
@@ -45,7 +53,6 @@ export default class MandaList extends React.Component {
   }
 
   loadData() {
-    console.log("load Data")
     storage.getAllDataForKey("test")
       .then(res => this.setState({data: res}))
       .catch(err => console.log("error"))
@@ -54,15 +61,20 @@ export default class MandaList extends React.Component {
   create(navigator) {
     const id = new Date().getTime()
     const newData = {
-      id: id, center: "", upper: "", left: "", bottom: "", right: "",
-      upperRight: "", upperLeft: "", bottomRight: "", bottomLeft: ""
+      id: id, center: "", upper: Object.assign({}, dataTemplate),
+      left: Object.assign({}, dataTemplate), bottom: Object.assign({}, dataTemplate),
+      right: Object.assign({}, dataTemplate), upperRight: Object.assign({}, dataTemplate),
+      upperLeft: Object.assign({}, dataTemplate), bottomRight: Object.assign({}, dataTemplate),
+      bottomLeft: Object.assign({}, dataTemplate)
     }
     storage.save({key: "test", id: id, data: newData})
     navigator.push({
       component: Mandalart, title: "",
       rightButtonSystemIcon: "trash",
       onRightButtonPress: () => this.removeStorage(id, navigator),
-      passProps: {data: newData, id: id, update: this.updateStorage, isOpen: true}})
+      passProps: {
+        data: newData, depth: 0, id: id, update: this.updateStorage, isOpen: true, base: "center"
+      }})
   }
 
   updateStorage(data) {
