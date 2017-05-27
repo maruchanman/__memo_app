@@ -106,6 +106,7 @@ export default class MandaList extends React.Component {
             key={data.id} id={data.id} data={data} navigator={this.props.navigator}
             updateStorage={this.updateStorage} removeStorage={this.removeStorage}/>
         ))}
+        {this.state.data.length == 0 ? <Text style={styles.welcome}>Let's start !</Text>: null}
       </ScrollView>
     )
   }
@@ -141,5 +142,10 @@ const styles = {
   },
   createButton: {
     color: "whitesmoke"
+  },
+  welcome: {
+    color: "white",
+    fontWeight: 'bold',
+    fontSize: 28
   }
 }

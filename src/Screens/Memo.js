@@ -141,7 +141,7 @@ export default class Mandalart extends React.Component {
           <TextInput
             ref="textInput"
             value={this.state.textValue}
-            placeholder="30文字まで"
+            placeholder={this.state.target == "center" ? "タイトル" : "30文字まで"}
             placeholderTextColor="white"
             blurOnSubmit={true}
             autoFocus={this.props.isOpen}
