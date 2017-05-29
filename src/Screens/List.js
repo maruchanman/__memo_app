@@ -60,22 +60,27 @@ export default class MandaList extends React.Component {
   }
 
   create(navigator) {
-    const id = new Date().getTime()
-    const newData = {
-      id: id, center: "", upper: Object.assign({}, dataTemplate),
-      left: Object.assign({}, dataTemplate), bottom: Object.assign({}, dataTemplate),
-      right: Object.assign({}, dataTemplate), upperRight: Object.assign({}, dataTemplate),
-      upperLeft: Object.assign({}, dataTemplate), bottomRight: Object.assign({}, dataTemplate),
-      bottomLeft: Object.assign({}, dataTemplate)
+    if (this.state.data.length < 10) {
+      const id = new Date().getTime()
+      const newData = {
+        id: id, center: "", upper: Object.assign({}, dataTemplate),
+        left: Object.assign({}, dataTemplate), bottom: Object.assign({}, dataTemplate),
+        right: Object.assign({}, dataTemplate), upperRight: Object.assign({}, dataTemplate),
+        upperLeft: Object.assign({}, dataTemplate), bottomRight: Object.assign({}, dataTemplate),
+        bottomLeft: Object.assign({}, dataTemplate)
+      }
+      storage.save({key: "test", id: id, data: newData})
+      navigator.push({
+        component: Mandalart, title: "",
+        rightButtonSystemIcon: "trash",
+        onRightButtonPress: () => this.removeStorage(id, navigator),
+        passProps: {
+          data: newData, depth: 0, id: id,
+          update: this.updateStorage, isOpen: true, base: "center"
+        }})
+    } else {
+      alert("現在マンダラは10個までしか同時に保存できません。\n近日中のアップデートで制限を解除できるようにしますので少々お待ちください。")
     }
-    storage.save({key: "test", id: id, data: newData})
-    navigator.push({
-      component: Mandalart, title: "",
-      rightButtonSystemIcon: "trash",
-      onRightButtonPress: () => this.removeStorage(id, navigator),
-      passProps: {
-        data: newData, depth: 0, id: id, update: this.updateStorage, isOpen: true, base: "center"
-      }})
   }
 
   updateStorage(data) {
