@@ -4,12 +4,16 @@ import {
   Text,
   ScrollView,
   AsyncStorage,
+  NativeModules,
   TouchableWithoutFeedback
 } from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import Storage from 'react-native-storage'
-import Mandalart from './Memo.js'
 import Constants from '../Constants.js'
+
+const { InAppUtils } = NativeModules
+var products = ['com.mandalart']
+InAppUtils.loadProducts(products, (err, prd) => {console.log(prd)})
 
 const storage = new Storage({
   size: 1000,
@@ -23,7 +27,7 @@ const dataTemplate = {
 }
 
 const CreateButton = props => (
-  <TouchableWithoutFeedback onPress={() => props.create(props.navigator)}>
+  <TouchableWithoutFeedback onPress={() => props.create(props.nav)}>
     <View style={[styles.row, styles.create]}>
       <Icon name="plus" size={30} style={styles.createButton} />
     </View>
@@ -31,13 +35,11 @@ const CreateButton = props => (
 )
 
 const Row = props => (
-  <TouchableWithoutFeedback onPress={() => props.navigator.push({
-    component: Mandalart, title: props.data.center,
-    rightButtonSystemIcon: "trash",
-    onRightButtonPress: () => props.removeStorage(props.id, props.navigator),
-    passProps: {
-      id: props.id, data: props.data, depth: 0,
-      update: props.updateStorage, isOpen: false, base: "center"}})}>
+  <TouchableWithoutFeedback onPress={() => props.nav.navigate("memo", {
+    title: props.data.center,
+    removeStrage: () => props.removeStorage(props.id, props.nav),
+    id: props.id, data: props.data, depth: 0,
+    update: props.updateStorage, isOpen: false, base: "center"})}>
     <View style={styles.row}>
       <Text style={styles.title}>{props.data.center}</Text>
     </View>
@@ -59,7 +61,7 @@ export default class MandaList extends React.Component {
       .catch(err => console.log("error"))
   }
 
-  create(navigator) {
+  create(nav) {
     if (this.state.data.length < 10) {
       const id = new Date().getTime()
       const newData = {
@@ -70,14 +72,12 @@ export default class MandaList extends React.Component {
         bottomLeft: Object.assign({}, dataTemplate)
       }
       storage.save({key: "test", id: id, data: newData})
-      navigator.push({
-        component: Mandalart, title: "",
-        rightButtonSystemIcon: "trash",
-        onRightButtonPress: () => this.removeStorage(id, navigator),
-        passProps: {
-          data: newData, depth: 0, id: id,
-          update: this.updateStorage, isOpen: true, base: "center"
-        }})
+      nav.navigate("memo", {
+        title: "",
+        removeStrage: () => this.removeStorage(id, nav),
+        data: newData, depth: 0, id: id,
+        update: this.updateStorage.bind(this), isOpen: true, base: "center"
+      })
     } else {
       alert("現在マンダラは10個までしか同時に保存できません。\n近日中のアップデートで制限を解除できるようにしますので少々お待ちください。")
     }
@@ -85,31 +85,29 @@ export default class MandaList extends React.Component {
 
   updateStorage(data) {
     storage.save({key: "test", id: data.id, data: data})
+    this.loadData()
   }
 
-  removeStorage(id, navigator) {
+  removeStorage(id, nav) {
     storage.remove({key: "test", id: id})
-    navigator.pop()
+    this.loadData()
+    nav.goBack(null)
   }
 
   componentDidMount() {
     this.loadData()
   }
 
-  componentWillReceiveProps(newProps) {
-    this.loadData()
-  }
-
   render() {
     return (
-      <ScrollView contentContainerStyle={styles.wrapper}>
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.wrapper}>
         <CreateButton
           create={this.create.bind(this)}
-          navigator={this.props.navigator} />
+          nav={this.props.navigation} />
         {this.state.data.sort((a, b) => a.id < b.id).map(data => (
           <Row
-            key={data.id} id={data.id} data={data} navigator={this.props.navigator}
-            updateStorage={this.updateStorage} removeStorage={this.removeStorage}/>
+            key={data.id} id={data.id} data={data} nav={this.props.navigation}
+            updateStorage={this.updateStorage.bind(this)} removeStorage={this.removeStorage.bind(this)}/>
         ))}
         {this.state.data.length == 0 ? <Text style={styles.welcome}>Let's start !</Text>: null}
       </ScrollView>
@@ -118,6 +116,9 @@ export default class MandaList extends React.Component {
 }
 
 const styles = {
+  scroll: {
+    backgroundColor: Constants.imageColor
+  },
   wrapper: {
     paddingVertical: 10,
     flexDirection: 'column',

@@ -58,11 +58,23 @@ class Block extends React.Component {
 
 export default class Mandalart extends React.Component {
 
+  static navigationOptions = ({navigation}) => ({
+    title: navigation.state.params.depth == 0
+      ? navigation.state.params.data.center
+      : navigation.state.params.data[navigation.state.params.base].center,
+    headerRight: navigation.state.params.depth == 0 ? (
+      <TouchableWithoutFeedback
+        onPress={() => navigation.state.params.removeStrage(
+          navigation.state.params.id, navigation)}>
+        <Icon name="trash-o" size={24} style={styles.icon}/>
+      </TouchableWithoutFeedback>) : null
+  })
+
   constructor(props) {
     super(props)
     this.state = {
-      data: props.data,
-      isOpen: props.isOpen,
+      data: props.navigation.state.params.data,
+      isOpen: props.navigation.state.params.isOpen,
       target: "center",
       textValue: ""
     }
@@ -72,10 +84,10 @@ export default class Mandalart extends React.Component {
     var newData = Object.assign({}, this.state.data)
     if (target == "center") {
       newData[target] = text
-    } else if (this.props.depth == 0) {
+    } else if (this.props.navigation.state.params.depth == 0) {
       newData[target]["center"] = text
     } else{
-      newData[this.props.base][target] = text
+      newData[this.props.navigation.state.params.base][target] = text
     }
     this.setState({data: newData, textValue: text})
   }
@@ -83,10 +95,10 @@ export default class Mandalart extends React.Component {
   openModal(target) {
     if (target == "center") {
       var textValue = this.state.data[target]
-    } else if (this.props.depth == 0) {
+    } else if (this.props.navigation.state.params.depth == 0) {
       var textValue = this.state.data[target]["center"]
     } else{
-      var textValue = this.state.data[this.props.base][target]
+      var textValue = this.state.data[this.props.navigation.state.params.base][target]
     }
     this.setState({
       target: target, isOpen: true, textValue: textValue},
@@ -95,16 +107,14 @@ export default class Mandalart extends React.Component {
 
   endEdit() {
     this.setState({isOpen: false, textValue: ""})
-    this.props.update(this.state.data)
+    this.props.navigation.state.params.update(this.state.data)
   }
 
   pushDeep(target) {
-    this.props.navigator.push({
-      component: Mandalart, title: this.state.data[target]["center"],
-      passProps: {
-        data: this.state.data, depth: 1, id: this.state.data.id,
-        update: this.props.update, isOpen: false, base: target
-      }
+    this.props.navigation.navigate("memo", {
+      title: this.state.data[target]["center"],
+      data: this.state.data, depth: 1, id: this.state.data.id,
+      update: this.props.navigation.state.params.update, isOpen: false, base: target
     })
   }
 
@@ -115,7 +125,7 @@ export default class Mandalart extends React.Component {
           <View style={styles.row}>
             {["upperLeft", "upper", "upperRight"].map(name => (
               <Block
-                name={name} key={name} depth={this.props.depth} base={this.props.base}
+                name={name} key={name} depth={this.props.navigation.state.params.depth} base={this.props.navigation.state.params.base}
                 pushDeep={this.pushDeep.bind(this)}
                 openModal={this.openModal.bind(this)} data={this.state.data}/>
             ))}
@@ -123,7 +133,7 @@ export default class Mandalart extends React.Component {
           <View style={styles.row}>
             {["left", "center", "right"].map(name => (
               <Block
-                name={name} key={name} depth={this.props.depth} base={this.props.base}
+                name={name} key={name} depth={this.props.navigation.state.params.depth} base={this.props.navigation.state.params.base}
                 pushDeep={this.pushDeep.bind(this)}
                 openModal={this.openModal.bind(this)} data={this.state.data}/>
             ))}
@@ -131,8 +141,8 @@ export default class Mandalart extends React.Component {
           <View style={styles.row}>
             {["bottomLeft", "bottom", "bottomRight"].map(name => (
               <Block
-                name={name} key={name} depth={this.props.depth}
-                pushDeep={this.pushDeep.bind(this)} base={this.props.base}
+                name={name} key={name} depth={this.props.navigation.state.params.depth}
+                pushDeep={this.pushDeep.bind(this)} base={this.props.navigation.state.params.base}
                 openModal={this.openModal.bind(this)} data={this.state.data}/>
             ))}
           </View>
@@ -144,7 +154,7 @@ export default class Mandalart extends React.Component {
             placeholder={this.state.target == "center" ? "タイトル" : "30文字まで"}
             placeholderTextColor="white"
             blurOnSubmit={true}
-            autoFocus={this.props.isOpen}
+            autoFocus={this.props.navigation.state.params.isOpen}
             selectionColor={Constants.imageColor}
             onChangeText={(text) => this.changeText(this.state.target, text)}
             onEndEditing={this.endEdit.bind(this)}
@@ -162,6 +172,10 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center'
+  },
+  icon: {
+    color: 'white',
+    padding: 10
   },
   row: {
     flexDirection: 'row'
